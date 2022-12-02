@@ -14,7 +14,6 @@ from App.controllers import (
     get_all_users_json,
     update_user,
     delete_user,
-
     create_image,
     get_all_images,
     get_all_images_json,
@@ -22,8 +21,7 @@ from App.controllers import (
     get_image,
     get_image_json,
     delete_image,
-
-    create_rating, 
+    create_rating,
     get_all_ratings,
     get_all_ratings_json,
     get_rating,
@@ -33,8 +31,7 @@ from App.controllers import (
     update_rating,
     get_calculated_rating,
     get_level,
-
-    create_ranking, 
+    create_ranking,
     get_all_rankings,
     get_all_rankings_json,
     get_ranking,
@@ -43,8 +40,7 @@ from App.controllers import (
     get_ranking_by_actors,
     get_calculated_ranking,
     update_ranking,
-
-    authenticate
+    authenticate,
 )
 
 from wsgi import app
@@ -52,23 +48,26 @@ from wsgi import app
 
 LOGGER = logging.getLogger(__name__)
 
-'''
+"""
    Unit Tests
-'''
-class UserUnitTests(unittest.TestCase):
+"""
 
+
+class UserUnitTests(unittest.TestCase):
     def test_new_user(self):
         user = User("bob", "bobpass")
         assert user.username == "bob"
 
-    def test_toJSON(self):
+    def test_to_json(self):
         user = User("bob", "bobpass")
-        user_json = user.toJSON()
-        self.assertDictEqual(user_json, {"id":None, "username":"bob", "images": [], "ratings": []})
-    
+        user_json = user.to_json()
+        self.assertDictEqual(
+            user_json, {"id": None, "username": "bob", "images": [], "ratings": []}
+        )
+
     def test_hashed_password(self):
         password = "mypass"
-        hashed = generate_password_hash(password, method='sha256')
+        hashed = generate_password_hash(password, method="sha256")
         user = User("bob", password)
         assert user.password != password
 
@@ -77,59 +76,71 @@ class UserUnitTests(unittest.TestCase):
         user = User("bob", password)
         assert user.check_password(password)
 
-class ImageUnitTests(unittest.TestCase):
 
+class ImageUnitTests(unittest.TestCase):
     def test_new_image(self):
         image = Image(1)
         assert image.rankings == []
 
-    def test_toJSON(self):
+    def test_to_json(self):
         image = Image(1)
-        image_json = image.toJSON()
-        self.assertDictEqual(image_json, {"id":None, "rankings":[], "userId": 1})
+        image_json = image.to_json()
+        self.assertDictEqual(image_json, {"id": None, "rankings": [], "userId": 1})
+
 
 class RatingUnitTests(unittest.TestCase):
-
     def test_new_rating(self):
         rating = Rating(1, 2, 3)
         assert rating.score == 3
 
-    def test_toJSON(self):
+    def test_to_json(self):
         rating = Rating(1, 2, 3)
-        rating_json = rating.toJSON()
-        self.assertDictEqual(rating_json, {"id":None, "creatorId":1, "targetId": 2, "score":3, "timeStamp": date.today()})
+        rating_json = rating.to_json()
+        self.assertDictEqual(
+            rating_json,
+            {
+                "id": None,
+                "creatorId": 1,
+                "targetId": 2,
+                "score": 3,
+                "timeStamp": date.today(),
+            },
+        )
+
 
 class RankingUnitTests(unittest.TestCase):
-
     def test_new_ranking(self):
         ranking = Ranking(1, 2, 3)
         assert ranking.score == 3
 
-    def test_toJSON(self):
+    def test_to_json(self):
         ranking = Ranking(1, 2, 3)
-        ranking_json = ranking.toJSON()
-        self.assertDictEqual(ranking_json, {"id":None, "creatorId":1, "imageId": 2, "score":3})
+        ranking_json = ranking.to_json()
+        self.assertDictEqual(
+            ranking_json, {"id": None, "creatorId": 1, "imageId": 2, "score": 3}
+        )
 
-'''
+
+"""
     Integration Tests
-'''
+"""
 
 # This fixture creates an empty database for the test and deletes it after the test
 # scope="class" would execute the fixture once and resued for all methods in the class
 @pytest.fixture(autouse=True, scope="module")
 def empty_db():
-    app.config.update({'TESTING': True, 'SQLALCHEMY_DATABASE_URI': 'sqlite:///test.db'})
+    app.config.update({"TESTING": True, "SQLALCHEMY_DATABASE_URI": "sqlite:///test.db"})
     create_db(app)
     yield app.test_client()
-    os.unlink(os.getcwd()+'/App/test.db')
+    os.unlink(os.getcwd() + "/App/test.db")
+
 
 def test_authenticate():
-        user = create_user("bob", "bobpass")
-        assert authenticate("bob", "bobpass") != None
+    user = create_user("bob", "bobpass")
+    assert authenticate("bob", "bobpass") != None
 
 
 class UsersIntegrationTests(unittest.TestCase):
-
     def test_create_user(self):
         user = create_user("rick", "bobpass")
         assert user.username == "rick"
@@ -150,7 +161,13 @@ class UsersIntegrationTests(unittest.TestCase):
 
     def test_get_all_users_json(self):
         users_json = get_all_users_json()
-        self.assertListEqual([{"id":1, "username":"bob", "images": [], "ratings": []}, {"id":2, "username":"rick", "images": [], "ratings": []}], users_json)
+        self.assertListEqual(
+            [
+                {"id": 1, "username": "bob", "images": [], "ratings": []},
+                {"id": 2, "username": "rick", "images": [], "ratings": []},
+            ],
+            users_json,
+        )
 
     def test_update_user(self):
         update_user(1, "ronnie")
@@ -163,8 +180,8 @@ class UsersIntegrationTests(unittest.TestCase):
         user = get_user(3)
         assert user == None
 
-class ImageIntegrationTests(unittest.TestCase):
 
+class ImageIntegrationTests(unittest.TestCase):
     def test_create_image(self):
         image = create_image(2)
         assert image.id == 1
@@ -182,11 +199,17 @@ class ImageIntegrationTests(unittest.TestCase):
 
     def test_get_all_images_json(self):
         images_json = get_all_images_json()
-        self.assertListEqual([{"id":1, "rankings":[], "userId": 2}, {"id":2, "rankings":[], "userId": 1}], images_json)
+        self.assertListEqual(
+            [
+                {"id": 1, "rankings": [], "userId": 2},
+                {"id": 2, "rankings": [], "userId": 1},
+            ],
+            images_json,
+        )
 
     def test_get_images_by_userid_json(self):
         images_json = get_images_by_userid_json(2)
-        self.assertListEqual(images_json, [{"id":1, "rankings":[], "userId": 2}])
+        self.assertListEqual(images_json, [{"id": 1, "rankings": [], "userId": 2}])
 
     def test_delete_image(self):
         image = create_image(1)
@@ -194,9 +217,8 @@ class ImageIntegrationTests(unittest.TestCase):
         image = get_image(image.id)
         assert image == None
 
-    
-class RatingIntegrationTests(unittest.TestCase):
 
+class RatingIntegrationTests(unittest.TestCase):
     def test_create_rating(self):
         rating = create_rating(1, 2, 3)
         assert rating.id == 1
@@ -214,15 +236,55 @@ class RatingIntegrationTests(unittest.TestCase):
 
     def test_get_all_ratings_json(self):
         ratings_json = get_all_ratings_json()
-        self.assertListEqual([{"id":1, "creatorId":1, "targetId": 2, "score":3, "timeStamp": date.today()}, {"id":2, "creatorId":2, "targetId": 1, "score":4, "timeStamp": date.today()}], ratings_json)
+        self.assertListEqual(
+            [
+                {
+                    "id": 1,
+                    "creatorId": 1,
+                    "targetId": 2,
+                    "score": 3,
+                    "timeStamp": date.today(),
+                },
+                {
+                    "id": 2,
+                    "creatorId": 2,
+                    "targetId": 1,
+                    "score": 4,
+                    "timeStamp": date.today(),
+                },
+            ],
+            ratings_json,
+        )
 
     def test_get_ratings_by_creatorid(self):
         ratings = get_ratings_by_creator(2)
-        self.assertListEqual(ratings, [{"id":2, "creatorId":2, "targetId": 1, "score":4, "timeStamp": date.today()}])
+        self.assertListEqual(
+            ratings,
+            [
+                {
+                    "id": 2,
+                    "creatorId": 2,
+                    "targetId": 1,
+                    "score": 4,
+                    "timeStamp": date.today(),
+                }
+            ],
+        )
 
     def test_get_ratings_by_targetid(self):
         ratings = get_ratings_by_target(2)
-        self.assertListEqual(ratings, [{"id":1, "creatorId":1, "targetId": 2, "score":3, "timeStamp": date.today()}])
+        self.assertListEqual(
+            ratings,
+            [
+                {
+                    "id": 1,
+                    "creatorId": 1,
+                    "targetId": 2,
+                    "score": 3,
+                    "timeStamp": date.today(),
+                }
+            ],
+        )
 
     def test_get_rating_by_actors(self):
         rating = get_rating_by_actors(1, 2)
@@ -243,7 +305,6 @@ class RatingIntegrationTests(unittest.TestCase):
 
 
 class RankingIntegrationTests(unittest.TestCase):
-
     def test_create_rating(self):
         ranking = create_ranking(1, 2, 3)
         assert ranking.id == 1
@@ -261,15 +322,25 @@ class RankingIntegrationTests(unittest.TestCase):
 
     def test_get_all_rankings_json(self):
         rankings_json = get_all_rankings_json()
-        self.assertListEqual([{"id":1, "creatorId":1, "imageId": 2, "score":3}, {"id":2, "creatorId":2, "imageId": 1, "score":4}], rankings_json)
+        self.assertListEqual(
+            [
+                {"id": 1, "creatorId": 1, "imageId": 2, "score": 3},
+                {"id": 2, "creatorId": 2, "imageId": 1, "score": 4},
+            ],
+            rankings_json,
+        )
 
     def test_get_rankings_by_creatorid(self):
         rankings = get_rankings_by_creator(2)
-        self.assertListEqual(rankings, [{"id":2, "creatorId":2, "imageId": 1, "score":4}])
+        self.assertListEqual(
+            rankings, [{"id": 2, "creatorId": 2, "imageId": 1, "score": 4}]
+        )
 
     def test_get_rankings_by_imageid(self):
         rankings = get_rankings_by_image(2)
-        self.assertListEqual(rankings, [{"id":1, "creatorId":1, "imageId": 2, "score":3}])
+        self.assertListEqual(
+            rankings, [{"id": 1, "creatorId": 1, "imageId": 2, "score": 3}]
+        )
 
     def test_get_ranking_by_actors(self):
         ranking = get_ranking_by_actors(1, 2)

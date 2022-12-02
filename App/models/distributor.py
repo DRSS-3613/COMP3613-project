@@ -8,7 +8,7 @@ class Distributor(db.Model):
     feed = db.relationship(
         "Feed", backref="distributor", lazy=True, cascade="all, delete-orphan"
     )
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.now)
 
     def __init__(self, num_profiles):
         self.num_profiles = num_profiles
@@ -22,6 +22,18 @@ class Distributor(db.Model):
 
     def get_timestamp(self):
         return self.timestamp
+
+    def get_receivers(self):
+        receivers = []
+        for feed in self.feed:
+            receivers.append(feed.receiver_id)
+        return receivers
+
+    def get_senders(self):
+        senders = []
+        for feed in self.feed:
+            senders.append(feed.sender_id)
+        return senders
 
     # def distribute(self):
     #     for i in range(1, self.num_profiles + 1):
