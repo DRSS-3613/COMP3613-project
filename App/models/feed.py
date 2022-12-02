@@ -16,6 +16,7 @@ class Feed(db.Model):
         self.sender_id = sender_id
         self.receiver_id = receiver_id
         self.distributor_id = distributor_id
+        self.seen = False
 
     def set_seen(self):
         self.seen = True

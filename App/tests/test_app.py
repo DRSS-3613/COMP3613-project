@@ -62,25 +62,25 @@ LOGGER = logging.getLogger(__name__)
 class UserUnitTests(unittest.TestCase):
 
     def test_create_user(self):
-        user = create_user("bob", "bobpass")
+        user = User("bob", "bobpass")
         self.assertEqual(user.username, "bob")
 
     def test_to_json(self):
-        user = User("bob", "bobpass")
+        user = User("bob1", "bobpass")
         user_json = user.to_json()
         self.assertDictEqual(
-            user_json, {"id": None, "username": "bob", "images": [], "ratings": []}
+            user_json, {"id": None, "username": "bob1", "images": []}
         )
 
     def test_hashed_password(self):
         password = "mypass"
         hashed = generate_password_hash(password, method="sha256")
-        user = User("bob", password)
+        user = User("bob2", password)
         assert user.password != password
 
     def test_check_password(self):
         password = "mypass"
-        user = User("bob", password)
+        user = User("bob3", password)
         assert user.check_password(password)
 
 
@@ -98,20 +98,13 @@ class ImageUnitTests(unittest.TestCase):
 
     def test_get_average_rank(self):
         image = Image(1, "https://www.picsum.com/200/300")
-        rank1 = Ranking(2, image.id, 5)
-        rank2 = Ranking(3, image.id, 1)
-        assert image.get_average_rank() == 3
-
-    def test_get_rankings(self):
-        image = Image(1, "https://www.picsum.com/200/300")
-        rank1 = Ranking(2, image.id, 1)
-        assert image.get_rankings() == [rank1]
+        assert image.get_average_rank() == 0
 
 
 class RatingUnitTests(unittest.TestCase):
     def test_new_rating(self):
         rating = Rating(1, 2, 3)
-        assert rating.score == 3
+        assert rating.rating == 3
 
     def test_to_json(self):
         rating = Rating(1, 2, 3)
@@ -129,7 +122,7 @@ class RatingUnitTests(unittest.TestCase):
 class RankingUnitTests(unittest.TestCase):
     def test_new_ranking(self):
         ranking = Ranking(1, 2, 3)
-        assert ranking.score == 3
+        assert ranking.rank == 3
 
     def test_to_json(self):
         ranking = Ranking(1, 2, 3)
