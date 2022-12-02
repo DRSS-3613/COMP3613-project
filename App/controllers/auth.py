@@ -25,3 +25,8 @@ def logout_user():
 
 def setup_jwt(app):
     return JWT(app, authenticate, identity)
+
+
+# for login manager
+def load_user_from_id(user_id):
+    return User.query.get(user_id)

@@ -8,9 +8,9 @@ from werkzeug.datastructures import FileStorage
 from datetime import timedelta
 
 
-from App.database import create_db
+from App.database import create_db, get_migrate
 
-from App.controllers import setup_jwt
+from App.controllers import setup_jwt, load_user_from_id
 
 from App.views import (
     index_views,
@@ -28,10 +28,8 @@ def add_views(app, views):
 
 def loadConfig(app, config):
     app.config["ENV"] = os.environ.get("ENV", "DEVELOPMENT")
-    delta = 7
     if app.config["ENV"] == "DEVELOPMENT":
         app.config.from_object("App.config")
-        delta = app.config["JWT_EXPIRATION_DELTA"]
     else:
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
             "SQLALCHEMY_DATABASE_URI"
@@ -39,10 +37,9 @@ def loadConfig(app, config):
         app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
         app.config["DEBUG"] = os.environ.get("ENV").upper() != "PRODUCTION"
         app.config["ENV"] = os.environ.get("ENV")
-        delta = os.environ.get("JWT_EXPIRATION_DELTA", 7)
-
-    app.config["JWT_EXPIRATION_DELTA"] = timedelta(days=int(delta))
-
+        app.config["JWT_EXPIRATION_DELTA"] = timedelta(
+            days=int(os.environ.get("JWT_EXPIRATION_DELTA"))
+        )
     for key, value in config.items():
         app.config[key] = config[key]
 
@@ -62,3 +59,15 @@ def create_app(config={}):
     setup_jwt(app)
     app.app_context().push()
     return app
+
+
+app = create_app()
+login_manager = LoginManager(app)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return load_user_from_id(user_id)
+
+
+migrate = get_migrate(app)
