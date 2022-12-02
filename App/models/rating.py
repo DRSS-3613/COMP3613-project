@@ -1,26 +1,23 @@
 from App.database import db
-from datetime import date
 
-#Ratings are created by users when they rate other users' profiles
-#Timestamps solve the 'limited number of ratings a day' problem
+
 class Rating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    creatorId =  db.Column(db.Integer,  nullable=False)
-    targetId = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    score = db.Column(db.Integer, nullable=False)
-    timeStamp = db.Column(db.Date , nullable=False)
-    
-    def __init__(self, creatorId, targetId, score):
-        self.creatorId = creatorId
-        self.targetId = targetId
-        self.score = score
-        self.timeStamp = date.today()
-    
-    def toJSON(self):
-        return{
-            'id': self.id,
-            'creatorId': self.creatorId,
-            'targetId': self.targetId,
-            'score': self.score,
-            'timeStamp': self.timeStamp
+    rater_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    rated_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    rater = db.relationship("User", foreign_keys=[rater_id])
+    rated = db.relationship("User", foreign_keys=[rated_id])
+    rating = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rater_id, rated_id, rating):
+        self.rater_id = rater_id
+        self.rated_id = rated_id
+        self.rating = rating
+
+    def to_json(self):
+        return {
+            "id": self.id,
+            "rater_id": self.rater_id,
+            "rated_id": self.rated_id,
+            "rating": self.rating,
         }

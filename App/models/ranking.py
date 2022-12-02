@@ -1,22 +1,21 @@
 from App.database import db
 
-#Rankings are created by users when they rate other users' pictures
+
 class Ranking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    creatorId =  db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    imageId =  db.Column(db.Integer, db.ForeignKey('image.id'), nullable=False)
-    score = db.Column(db.Integer, nullable=False)
-    
-    
-    def __init__(self, creatorId, imageId, score):
-        self.creatorId = creatorId
-        self.imageId = imageId
-        self.score = score
-    
-    def toJSON(self):
-        return{
-            'id': self.id,
-            'creatorId': self.creatorId,
-            'imageId': self.imageId,
-            'score': self.score,
+    ranker_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    image_id = db.Column(db.Integer, db.ForeignKey("image.id"), nullable=False)
+    rank = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, ranker_id, image_id, rank):
+        self.ranked_id = ranker_id
+        self.image_id = image_id
+        self.rank = rank
+
+    def to_json(self):
+        return {
+            "id": self.id,
+            "ranker_id": self.ranker_id,
+            "image_id": self.image_id,
+            "rank": self.rank,
         }

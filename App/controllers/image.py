@@ -1,45 +1,55 @@
 from App.models import Image
 from App.database import db
 
-def create_image(userId):
-    newImage = Image(userId=userId)
-    db.session.add(newImage)
+
+def create_image(user_id, url):
+    image = Image(user_id, url)
+    db.session.add(image)
     db.session.commit()
-    return newImage
+    return image
+
 
 def get_image(id):
-    return Image.query.get(id)
+    image = Image.query.get(id)
+    return image
+
 
 def get_image_json(id):
     image = Image.query.get(id)
-    if not image:
-        return []
-    image = image.toJSON()
-    return image
+    if image:
+        return image.to_json()
+    return []
 
-def get_images_by_userid(userId):
-    return Image.query.filter_by(userId=userId)
-
-def get_images_by_userid_json(userId):
-    images = Image.query.filter_by(userId=userId)
-    if not images:
-        return []
-    images = [image.toJSON() for image in images]
-    return images
 
 def get_all_images():
-    return Image.query.all()
+    images = Image.query.all()
+    return images
+
 
 def get_all_images_json():
     images = Image.query.all()
-    if images:
-        images = [image.toJSON() for image in images]
-        return images
-    return []
+    return [image.to_json() for image in images]
 
-def delete_image(id):
-    image = get_image(id)
+
+def get_images_by_user(user_id):
+    images = Image.query.filter_by(user_id=user_id).all()
+    return images
+
+
+def get_images_by_user_json(user_id):
+    images = Image.query.filter_by(user_id=user_id).all()
+    return [image.to_json() for image in images]
+
+
+def get_average_image_rank(image_id):
+    image = get_image(image_id)
     if image:
-        db.session.delete(image)
-        return db.session.commit()
-    return None
+        return image.get_average_rank()
+    return 0
+
+
+def get_image_rankings(image_id):
+    image = get_image(image_id)
+    if image:
+        return image.get_all_rankings()
+    return []
