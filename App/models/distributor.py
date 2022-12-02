@@ -35,11 +35,6 @@ class Distributor(db.Model):
             senders.append(feed.sender_id)
         return senders
 
-    # def distribute(self):
-    #     for i in range(1, self.num_profiles + 1):
-    #         feed = Feed(self.id, i)
-    #         db.session.add(feed)
-
     def to_json(self):
         return {
             "id": self.id,
