@@ -1,6 +1,5 @@
 from werkzeug.security import check_password_hash, generate_password_hash
 from App.database import db
-from flask import jsonify
 
 
 class User(db.Model):
@@ -13,12 +12,6 @@ class User(db.Model):
     rankings = db.relationship(
         "Ranking", backref="user", lazy=True, cascade="all, delete-orphan"
     )
-    feed = db.relationship(
-        "Feed", foreign_keys="Feed.sender_id", backref="sender", lazy="dynamic"
-    )
-    recipients = db.relationship(
-        "Feed", backref="Feed.receiver_id", lazy=True, cascade="all, delete-orphan"
-    )
 
     def __init__(self, username, password):
         self.username = username
@@ -28,8 +21,7 @@ class User(db.Model):
         return {
             "id": self.id,
             "username": self.username,
-            "images": [image.toJSON() for image in self.images],
-            # 'ratings': [rating.toJSON() for rating in self.ratings]
+            "images": [image.to_json() for image in self.images],
         }
 
     def set_password(self, password):

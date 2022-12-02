@@ -12,7 +12,7 @@ def create_user(username, password):
 def get_user_by_username(username):
     user = User.query.filter_by(username=username).first()
     if user:
-        user = user.toJSON()
+        user = user.to_json()
     return user
 
 
@@ -28,7 +28,7 @@ def get_all_users_json():
     users = User.query.all()
     if not users:
         return []
-    users = [user.toJSON() for user in users]
+    users = [user.to_json() for user in users]
     return users
 
 

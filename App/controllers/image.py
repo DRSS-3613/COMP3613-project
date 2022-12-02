@@ -42,7 +42,14 @@ def get_images_by_user_json(user_id):
 
 
 def get_average_image_rank(image_id):
-    images = Image.query.filter_by(image_id=image_id).all()
-    if images:
-        return sum([image.rank for image in images]) / len(images)
+    image = get_image(image_id)
+    if image:
+        return image.get_average_rank()
     return 0
+
+
+def get_image_rankings(image_id):
+    image = get_image(image_id)
+    if image:
+        return image.get_all_rankings()
+    return []

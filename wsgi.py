@@ -8,10 +8,14 @@ from App.controllers import (
     create_user,
     get_all_users_json,
     get_all_users,
+    get_user_by_username,
     create_image,
     create_distributor,
     distribute,
     get_all_distributors,
+    get_feeds_by_receiver,
+    get_feed,
+    view_feed,
 )
 
 # This commands file allow you to create convenient CLI commands for testing controllers
@@ -95,18 +99,26 @@ app.cli.add_command(test)
 
 # Create users for tests
 @app.cli.command("create-users")
-def create_users_command():
-    create_user("rob1", "robpass")
-    create_user("rob2", "robpass")
-    create_user("rob3", "robpass")
-    create_user("rob4", "robpass")
-    print("rob1-rob4 created")
+@click.argument("number", default=4)
+def create_users_command(number):
+    for i in range(1, number + 1):
+        user = get_user_by_username(f"rob{i}")
+        if not user:
+            create_user(f"rob{i}", f"rob{i}pass")
+            print(f"rob{i} created!")
+        else:
+            print(f"rob{i} already exists")
 
 
 @app.cli.command("create-user")
-def create_user_command():
-    create_user("bob", "bobpass")
-    print("bob created!")
+@click.argument("number", default="1")
+def create_user_command(number):
+    user = get_user_by_username(f"bob{number}")
+    if not user:
+        create_user(f"bob{number}", "bobpass")
+        print(f"bob{number} created!")
+    else:
+        print(f"bob{number} already exists")
 
 
 @app.cli.command("add-user-images")
@@ -124,8 +136,45 @@ def add_images_command():
 def distribute_data_command():
     users = get_all_users()
     dist = create_distributor(len(users))
-    distribute(dist.id)
-    print("data distributed...see table below")
+    outcome = distribute(dist.id)
+    if outcome:
+        print("data distributed...see table below")
+        distributors = get_all_distributors()
+        print(distributors)
+        print("FEED ID  |  RECEIVER  |  SENDER  |  DISTRIBUTOR  |  SEEN")
+        for distributor in distributors:
+            for feed in distributor.feed:
+                print(
+                    f"    {feed.id}    |    {feed.receiver_id}    |    {feed.sender_id}    |    {feed.distributor_id}    |   {feed.seen}    "
+                )
+    else:
+        print("data not distributed - all profiles at limit")
+
+
+@app.cli.command("view-profile")
+@click.argument("feed-id", default=1)
+def view_profile_command(feed_id):
+    feed = get_feed(feed_id)
+    if feed:
+        view_feed(feed_id)
+    else:
+        print("feed not found")
+
+
+@app.cli.command("view-all-feeds")
+@click.argument("receiver-id", default=1)
+def view_all_feeds_command(receiver_id):
+    feeds = get_feeds_by_receiver(receiver_id)
+    if feeds:
+        for feed in feeds:
+            view_feed(feed.id)
+            print("all feeds viewed")
+    else:
+        print("no feeds found")
+
+
+@app.cli.command("print-distribution")
+def print_distribution_command():
     distributors = get_all_distributors()
     print("FEED ID  |  RECEIVER  |  SENDER  |  DISTRIBUTOR  |  SEEN")
     for distributor in distributors:

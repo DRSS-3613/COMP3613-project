@@ -27,20 +27,24 @@ class Image(db.Model):
     def set_user_id(self, user_id):
         self.user_id = user_id
 
+    def get_all_rankings(self):
+        return self.rankings
+
     # moved this logic to image controller
-    # def get_average_rank(self):
-    #     rankings = self.rankings
-    #     if len(rankings) == 0:
-    #         return 0
-    #     total = 0
-    #     for ranking in rankings:
-    #         total += ranking.rank
-    #     return total / len(rankings)
+    def get_average_rank(self):
+        rankings = self.rankings
+        if len(rankings) == 0:
+            return 0
+        total = 0
+        for ranking in rankings:
+            total += ranking.rank
+        return total / len(rankings)
 
     def to_json(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
-            "rank": self.rank,
+            "rank": self.get_average_rank(),
+            "num_rankings": len(self.rankings),
             "url": self.url,
         }
