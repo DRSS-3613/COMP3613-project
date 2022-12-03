@@ -3,16 +3,17 @@ from App.database import db
 
 
 def create_user(username, password):
-    new_user = User(username=username, password=password)
-    db.session.add(new_user)
-    db.session.commit()
-    return new_user
+    user = get_user_by_username(username)
+    if not user:
+        new_user = User(username=username, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+        return new_user
+    return None
 
 
 def get_user_by_username(username):
     user = User.query.filter_by(username=username).first()
-    if user:
-        user = user.to_json()
     return user
 
 
@@ -46,5 +47,5 @@ def delete_user(id):
     user = get_user(id)
     if user:
         db.session.delete(user)
-        return db.session.commit()
-    return None
+        return True
+    return False

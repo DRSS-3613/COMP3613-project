@@ -1,12 +1,16 @@
 from App.models import Image
+from App.controllers import get_user
 from App.database import db
 
 
 def create_image(user_id, url):
-    image = Image(user_id, url)
-    db.session.add(image)
-    db.session.commit()
-    return image
+    user = get_user(user_id)
+    if user:
+        image = Image(user_id, url)
+        db.session.add(image)
+        db.session.commit()
+        return image
+    return None
 
 
 def get_image(id):
@@ -53,3 +57,11 @@ def get_image_rankings(image_id):
     if image:
         return image.get_all_rankings()
     return []
+
+
+def delete_image(id):
+    image = get_image(id)
+    if image:
+        db.session.delete(image)
+        return True
+    return False
