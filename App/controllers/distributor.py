@@ -5,14 +5,18 @@ from App.controllers.feed import (
     create_feed,
     get_feeds_by_receiver,
 )
+from App.controllers.user import get_all_users
 from datetime import timedelta, datetime
 
 
-def create_distributor(num_profiles):
-    distributor = Distributor(num_profiles)
-    db.session.add(distributor)
-    db.session.commit()
-    return distributor
+def create_distributor():
+    num_users = len(get_all_users())
+    if num_users > 2:
+        distributor = Distributor(num_users)
+        db.session.add(distributor)
+        db.session.commit()
+        return distributor
+    return None
 
 
 def get_distributor(id):
@@ -40,6 +44,15 @@ def get_distributor_feeds(id):
     if distributor:
         return distributor.feed
     return None
+
+
+def delete_distributor(id):
+    distributor = Distributor.query.get(id)
+    if distributor:
+        db.session.delete(distributor)
+        db.session.commit()
+        return True
+    return False
 
 
 def distribute(dist_id):

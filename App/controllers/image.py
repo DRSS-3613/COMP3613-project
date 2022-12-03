@@ -63,5 +63,6 @@ def delete_image(id):
     image = get_image(id)
     if image:
         db.session.delete(image)
+        db.session.commit()
         return True
     return False

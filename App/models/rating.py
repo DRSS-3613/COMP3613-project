@@ -14,6 +14,9 @@ class Rating(db.Model):
         self.rated_id = rated_id
         self.rating = rating
 
+    def set_rating(self, new_rating):
+        self.rating = new_rating
+
     def to_json(self):
         return {
             "id": self.id,

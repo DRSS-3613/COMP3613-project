@@ -1,12 +1,17 @@
 from App.models import Ranking
+from App.controllers import get_user, get_image
 from App.database import db
 
 
 def create_ranking(ranker_id, image_id, rank):
-    ranking = Ranking(ranker_id, image_id, rank)
-    db.session.add(ranking)
-    db.session.commit()
-    return ranking
+    ranker = get_user(ranker_id)
+    image = get_image(image_id)
+    if ranker and image:
+        ranking = Ranking(ranker_id, image_id, rank)
+        db.session.add(ranking)
+        db.session.commit()
+        return ranking
+    return None
 
 
 def get_ranking(id):
@@ -62,5 +67,6 @@ def delete_ranking(id):
     ranking = Ranking.query.get(id)
     if ranking:
         db.session.delete(ranking)
-        return db.session.commit()
-    return None
+        db.session.commit()
+        return True
+    return False

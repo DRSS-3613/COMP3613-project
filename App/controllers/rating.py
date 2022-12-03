@@ -1,12 +1,17 @@
 from App.models import Rating
+from App.controllers import get_user
 from App.database import db
 
 
 def create_rating(rater_id, rated_id, rating):
-    rating = Rating(rater_id, rated_id, rating)
-    db.session.add(rating)
-    db.session.commit()
-    return rating
+    rater = get_user(rater_id)
+    rated = get_user(rated_id)
+    if rater and rated:
+        rating = Rating(rater_id, rated_id, rating)
+        db.session.add(rating)
+        db.session.commit()
+        return rating
+    return None
 
 
 def get_rating(id):
@@ -49,10 +54,10 @@ def get_ratings_by_rated_json(rated_id):
     return [rating.to_json() for rating in ratings]
 
 
-def update_rating(id, rating):
+def update_rating(id, new_rating):
     rating = Rating.query.get(id)
     if rating:
-        rating.set_rating(rating)
+        rating.set_rating(new_rating)
         db.session.commit()
         return rating
     return None

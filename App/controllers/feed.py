@@ -1,12 +1,17 @@
 from App.models import Feed
 from App.database import db
+from App.controllers.user import get_user
 
 
 def create_feed(sender_id, receiver_id, distributor_id):
-    feed = Feed(sender_id, receiver_id, distributor_id)
-    db.session.add(feed)
-    db.session.commit()
-    return feed
+    sender = get_user(sender_id)
+    receiver = get_user(receiver_id)
+    if sender and receiver:
+        feed = Feed(sender_id, receiver_id, distributor_id)
+        db.session.add(feed)
+        db.session.commit()
+        return feed
+    return None
 
 
 def get_feed(id):
@@ -62,5 +67,6 @@ def delete_feed(id):
     feed = Feed.query.get(id)
     if feed:
         db.session.delete(feed)
-        return db.session.commit()
-    return None
+        db.session.commit()
+        return True
+    return False
