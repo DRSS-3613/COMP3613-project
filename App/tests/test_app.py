@@ -1,4 +1,4 @@
-import os
+# import os
 import logging
 import pytest
 import unittest
@@ -74,13 +74,14 @@ class UserUnitTests(unittest.TestCase):
 
     def test_to_json(self):
         user = User("bob1", "bobpass")
-        user_json = user.to_json()
-        self.assertDictEqual(user_json, {"id": None, "username": "bob1", "images": []})
+        self.assertDictEqual(
+            user.to_json(), {"id": None, "username": "bob1", "images": []}
+        )
 
     def test_hashed_password(self):
         password = "mypass"
         hashed = generate_password_hash(password, method="sha256")
-        user = User("bob2", password)
+        user = User("bob", password)
         assert user.password != password
 
     def test_check_password(self):
@@ -207,7 +208,7 @@ def empty_db():
 
 
 def test_authenticate():
-    user = create_user("bob", "bobpass")
+    create_user("bob", "bobpass")
     assert authenticate("bob", "bobpass") is not None
 
 
@@ -218,7 +219,7 @@ class UsersIntegrationTests(unittest.TestCase):
         assert user is not None
 
     def test_create_user_with_existing_username(self):
-        user1 = create_user("rob", "robpass")
+        create_user("rob", "robpass")
         user2 = create_user("rob", "robpass")
         assert user2 is None
 
@@ -283,8 +284,8 @@ class ImagesIntegrationTests(unittest.TestCase):
 
     def test_get_images_by_user(self):
         user = create_user("tom4", "tompass")
-        image1 = create_image(user.id, "https://www.picsum.com/200/300")
-        image2 = create_image(user.id, "https://www.picsum.com/200/300")
+        create_image(user.id, "https://www.picsum.com/200/300")
+        create_image(user.id, "https://www.picsum.com/200/300")
         images = get_images_by_user(user.id)
         assert len(images) == 2
 
@@ -296,8 +297,8 @@ class ImagesIntegrationTests(unittest.TestCase):
         user = create_user("tom5", "tompass")
         user2 = create_user("tom6", "tompass")
         image = create_image(user.id, "https://www.picsum.com/200/300")
-        ranking1 = create_ranking(user2.id, image.id, 1)
-        ranking2 = create_ranking(user2.id, image.id, 3)
+        create_ranking(user2.id, image.id, 1)
+        create_ranking(user2.id, image.id, 3)
         average_rank = get_average_image_rank(image.id)
         assert average_rank == 2
 
@@ -309,8 +310,8 @@ class ImagesIntegrationTests(unittest.TestCase):
         user = create_user("tom7", "tompass")
         user2 = create_user("tom8", "tompass")
         image = create_image(user.id, "https://www.picsum.com/200/300")
-        ranking1 = create_ranking(user2.id, image.id, 1)
-        ranking2 = create_ranking(user2.id, image.id, 3)
+        create_ranking(user2.id, image.id, 1)
+        create_ranking(user2.id, image.id, 3)
         rankings = get_image_rankings(image.id)
         assert len(rankings) == 2
 
@@ -359,15 +360,15 @@ class FeedIntegrationTests(unittest.TestCase):
 
     def test_get_feeds_by_sender(self):
         user = create_user("jane4", "janepass")
-        feed = create_feed(user.id, 2, 1)
-        feed2 = create_feed(user.id, 3, 1)
+        create_feed(user.id, 2, 1)
+        create_feed(user.id, 3, 1)
         feeds = get_feeds_by_sender(user.id)
         assert len(feeds) == 2
 
     def test_get_feeds_by_receiver(self):
         user = create_user("jane5", "janepass")
-        feed = create_feed(1, user.id, 1)
-        feed2 = create_feed(2, user.id, 1)
+        create_feed(1, user.id, 1)
+        create_feed(2, user.id, 1)
         feeds = get_feeds_by_receiver(user.id)
         assert len(feeds) == 2
 
@@ -422,15 +423,15 @@ class RatingsIntegrationTests(unittest.TestCase):
 
     def test_get_ratings_by_rater(self):
         user = create_user("jane2", "janepass")
-        rating = create_rating(user.id, 2, 5)
-        rating2 = create_rating(user.id, 3, 3)
+        create_rating(user.id, 2, 5)
+        create_rating(user.id, 3, 3)
         ratings = get_ratings_by_rater(user.id)
         assert len(ratings) == 2
 
     def test_get_ratings_by_rated(self):
         user = create_user("jane3", "janepass")
-        rating = create_rating(1, user.id, 5)
-        rating2 = create_rating(2, user.id, 3)
+        create_rating(1, user.id, 5)
+        create_rating(2, user.id, 3)
         ratings = get_ratings_by_rated(user.id)
         assert len(ratings) == 2
 
@@ -486,8 +487,8 @@ class RankingsIntegrationTests(unittest.TestCase):
 
     def test_get_rankings_by_user(self):
         user = create_user("jane1", "janepass")
-        ranking = create_ranking(user.id, 2, 5)
-        ranking2 = create_ranking(user.id, 3, 3)
+        create_ranking(user.id, 2, 5)
+        create_ranking(user.id, 3, 3)
         rankings = get_rankings_by_ranker(user.id)
         assert len(rankings) == 2
 
@@ -497,8 +498,8 @@ class RankingsIntegrationTests(unittest.TestCase):
 
     def test_get_rankings_by_image(self):
         image = create_image(1, "https://www.picsum.com/200/300")
-        ranking = create_ranking(2, image.id, 5)
-        ranking2 = create_ranking(3, image.id, 3)
+        create_ranking(2, image.id, 5)
+        create_ranking(3, image.id, 3)
         rankings = get_rankings_by_image(image.id)
         assert len(rankings) == 2
 
@@ -561,5 +562,5 @@ class DistributorsIntegrationTests(unittest.TestCase):
         distributor = create_distributor()
         num_users = len(get_all_users())
         distribute(distributor.id)
-        num_feeds = len([f for f in get_distributor_feeds(distributor.id)])
+        num_feeds = len(get_distributor_feeds(distributor.id))
         assert num_feeds == num_users
