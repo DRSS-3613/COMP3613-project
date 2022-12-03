@@ -135,7 +135,7 @@ def add_images_command():
 @app.cli.command("distribute-data")
 def distribute_data_command():
     users = get_all_users()
-    dist = create_distributor(len(users))
+    dist = create_distributor()
     outcome = distribute(dist.id)
     if outcome:
         print("data distributed...see table below")
