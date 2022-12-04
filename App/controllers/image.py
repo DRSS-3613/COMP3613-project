@@ -59,6 +59,11 @@ def get_image_rankings(image_id):
     return []
 
 
+def get_image_rankings_json(image_id):
+    rankings = get_image_rankings(image_id)
+    return [ranking.to_json() for ranking in rankings]
+
+
 def delete_image(id):
     image = get_image(id)
     if image:

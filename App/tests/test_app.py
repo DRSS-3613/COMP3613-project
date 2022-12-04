@@ -223,8 +223,8 @@ class UsersIntegrationTests(unittest.TestCase):
 
     def test_get_user(self):
         user = create_user("rob1", "robpass")
-        user2 = get_user(user.id)
-        assert user2.username == "rob1"
+        user2 = get_user(user.get_id())
+        assert user2.get_username() == "rob1"
 
     def test_get_user_with_invalid_id(self):
         user = get_user(9080)
@@ -232,8 +232,8 @@ class UsersIntegrationTests(unittest.TestCase):
 
     def test_update_user(self):
         user = create_user("rob2", "robpass")
-        user = update_user(user.id, "rob3")
-        assert user.username == "rob3"
+        user = update_user(user.get_id(), "rob3")
+        assert user.get_username() == "rob3"
 
     def test_update_user_with_invalid_id(self):
         user = update_user(9080, "rob3")
@@ -241,7 +241,7 @@ class UsersIntegrationTests(unittest.TestCase):
 
     def test_delete_user(self):
         user = create_user("rob4", "robpass")
-        status = delete_user(user.id)
+        status = delete_user(user.get_id())
         assert status is True
 
 
@@ -249,8 +249,8 @@ class UsersIntegrationTests(unittest.TestCase):
 class ImagesIntegrationTests(unittest.TestCase):
     def test_create_image(self):
         user = create_user("tom1", "tompass")
-        image = create_image(user.id, "https://www.picsum.com/200/300")
-        assert image.user_id == user.id
+        image = create_image(user.get_id(), "https://www.picsum.com/200/300")
+        assert image.get_user_id() == user.get_id()
 
     def test_create_image_with_invalid_user_id(self):
         image = create_image(9080, "https://www.picsum.com/200/300")
@@ -258,9 +258,9 @@ class ImagesIntegrationTests(unittest.TestCase):
 
     def test_get_image(self):
         user = create_user("tom2", "tompass")
-        image = create_image(user.id, "https://www.picsum.com/200/300")
-        image2 = get_image(image.id)
-        assert image2.url == image.url
+        image = create_image(user.get_id(), "https://www.picsum.com/200/300")
+        image2 = get_image(image.get_id())
+        assert image2.get_url() == image.get_url()
 
     def test_get_image_with_invalid_id(self):
         image = get_image(9080)
@@ -268,12 +268,12 @@ class ImagesIntegrationTests(unittest.TestCase):
 
     def test_get_image_json(self):
         user = create_user("tom3", "tompass")
-        image = create_image(user.id, "https://www.picsum.com/200/300")
+        image = create_image(user.get_id(), "https://www.picsum.com/200/300")
         self.assertDictEqual(
-            get_image_json(image.id),
+            get_image_json(image.get_id()),
             {
-                "id": image.id,
-                "user_id": user.id,
+                "id": image.get_id(),
+                "user_id": user.get_id(),
                 "rank": 0,
                 "num_rankings": 0,
                 "url": "https://www.picsum.com/200/300",
@@ -282,9 +282,9 @@ class ImagesIntegrationTests(unittest.TestCase):
 
     def test_get_images_by_user(self):
         user = create_user("tom4", "tompass")
-        create_image(user.id, "https://www.picsum.com/200/300")
-        create_image(user.id, "https://www.picsum.com/200/300")
-        images = get_images_by_user(user.id)
+        create_image(user.get_id(), "https://www.picsum.com/200/300")
+        create_image(user.get_id(), "https://www.picsum.com/200/300")
+        images = get_images_by_user(user.get_id())
         assert len(images) == 2
 
     def test_get_images_by_user_with_invalid_user_id(self):
@@ -294,10 +294,10 @@ class ImagesIntegrationTests(unittest.TestCase):
     def test_get_average_image_rank(self):
         user = create_user("tom5", "tompass")
         user2 = create_user("tom6", "tompass")
-        image = create_image(user.id, "https://www.picsum.com/200/300")
-        create_ranking(user2.id, image.id, 1)
-        create_ranking(user2.id, image.id, 3)
-        average_rank = get_average_image_rank(image.id)
+        image = create_image(user.get_id(), "https://www.picsum.com/200/300")
+        create_ranking(user2.get_id(), image.get_id(), 1)
+        create_ranking(user2.get_id(), image.get_id(), 3)
+        average_rank = get_average_image_rank(image.get_id())
         assert average_rank == 2
 
     def test_get_average_image_rank_with_invalid_image_id(self):
@@ -307,16 +307,16 @@ class ImagesIntegrationTests(unittest.TestCase):
     def test_get_image_rankings(self):
         user = create_user("tom7", "tompass")
         user2 = create_user("tom8", "tompass")
-        image = create_image(user.id, "https://www.picsum.com/200/300")
-        create_ranking(user2.id, image.id, 1)
-        create_ranking(user2.id, image.id, 3)
-        rankings = get_image_rankings(image.id)
+        image = create_image(user.get_id(), "https://www.picsum.com/200/300")
+        create_ranking(user2.get_id(), image.get_id(), 1)
+        create_ranking(user2.get_id(), image.get_id(), 3)
+        rankings = get_image_rankings(image.get_id())
         assert len(rankings) == 2
 
     def test_delete_image(self):
         user = create_user("tom9", "tompass")
-        image = create_image(user.id, "https://www.picsum.com/200/300")
-        status = delete_image(image.id)
+        image = create_image(user.get_id(), "https://www.picsum.com/200/300")
+        status = delete_image(image.get_id())
         assert status is True
 
 
@@ -336,7 +336,7 @@ class FeedIntegrationTests(unittest.TestCase):
 
     def test_get_feed(self):
         feed = create_feed(1, 2, 1)
-        feed2 = get_feed(feed.id)
+        feed2 = get_feed(feed.get_id())
         assert feed2 is not None
 
     def test_get_feed_with_invalid_id(self):
@@ -346,34 +346,34 @@ class FeedIntegrationTests(unittest.TestCase):
     def test_get_feed_json(self):
         feed = create_feed(1, 2, 1)
         self.assertDictEqual(
-            get_feed_json(feed.id),
+            get_feed_json(feed.get_id()),
             {
-                "id": feed.id,
+                "id": feed.get_id(),
                 "sender_id": 1,
                 "receiver_id": 2,
-                "distributor_id": feed.distributor_id,
+                "distributor_id": feed.get_distributor_id(),
                 "seen": False,
             },
         )
 
     def test_get_feeds_by_sender(self):
         user = create_user("jane4", "janepass")
-        create_feed(user.id, 2, 1)
-        create_feed(user.id, 3, 1)
-        feeds = get_feeds_by_sender(user.id)
+        create_feed(user.get_id(), 2, 1)
+        create_feed(user.get_id(), 3, 1)
+        feeds = get_feeds_by_sender(user.get_id())
         assert len(feeds) == 2
 
     def test_get_feeds_by_receiver(self):
         user = create_user("jane5", "janepass")
-        create_feed(1, user.id, 1)
-        create_feed(2, user.id, 1)
-        feeds = get_feeds_by_receiver(user.id)
+        create_feed(1, user.get_id(), 1)
+        create_feed(2, user.get_id(), 1)
+        feeds = get_feeds_by_receiver(user.get_id())
         assert len(feeds) == 2
 
     def test_view_feed(self):
         feed = create_feed(1, 2, 1)
-        feed = view_feed(feed.id)
-        assert feed.seen is True
+        feed = view_feed(feed.get_id())
+        assert feed.is_seen() is True
 
     def test_view_feed_with_invalid_id(self):
         feed = view_feed(9080)
@@ -381,7 +381,7 @@ class FeedIntegrationTests(unittest.TestCase):
 
     def test_delete_feed(self):
         feed = create_feed(1, 2, 1)
-        status = delete_feed(feed.id)
+        status = delete_feed(feed.get_id())
         assert status is True
 
     def test_delete_feed_with_invalid_id(self):
@@ -393,7 +393,7 @@ class FeedIntegrationTests(unittest.TestCase):
 class RatingsIntegrationTests(unittest.TestCase):
     def test_create_rating(self):
         rating = create_rating(1, 2, 5)
-        assert rating.rated_id == 2
+        assert rating.get_rated_id() == 2
 
     def test_create_rating_with_invalid_user_id(self):
         with self.subTest("Invalid rater id"):
@@ -405,8 +405,8 @@ class RatingsIntegrationTests(unittest.TestCase):
 
     def test_get_rating(self):
         rating = create_rating(1, 2, 5)
-        rating2 = get_rating(rating.id)
-        assert rating2.rated_id == rating.rated_id
+        rating2 = get_rating(rating.get_id())
+        assert rating2.get_rated_id() == rating.get_rated_id()
 
     def test_get_rating_with_invalid_id(self):
         rating = get_rating(9080)
@@ -415,28 +415,28 @@ class RatingsIntegrationTests(unittest.TestCase):
     def test_get_rating_json(self):
         rating = create_rating(1, 2, 5)
         self.assertDictEqual(
-            get_rating_json(rating.id),
-            {"id": rating.id, "rater_id": 1, "rated_id": 2, "rating": 5},
+            get_rating_json(rating.get_id()),
+            {"id": rating.get_id(), "rater_id": 1, "rated_id": 2, "rating": 5},
         )
 
     def test_get_ratings_by_rater(self):
         user = create_user("jane2", "janepass")
-        create_rating(user.id, 2, 5)
-        create_rating(user.id, 3, 3)
-        ratings = get_ratings_by_rater(user.id)
+        create_rating(user.get_id(), 2, 5)
+        create_rating(user.get_id(), 3, 3)
+        ratings = get_ratings_by_rater(user.get_id())
         assert len(ratings) == 2
 
     def test_get_ratings_by_rated(self):
         user = create_user("jane3", "janepass")
-        create_rating(1, user.id, 5)
-        create_rating(2, user.id, 3)
-        ratings = get_ratings_by_rated(user.id)
+        create_rating(1, user.get_id(), 5)
+        create_rating(2, user.get_id(), 3)
+        ratings = get_ratings_by_rated(user.get_id())
         assert len(ratings) == 2
 
     def test_update_rating(self):
         rating = create_rating(1, 2, 5)
-        rating = update_rating(rating.id, 3)
-        assert rating.rating == 3
+        rating = update_rating(rating.get_id(), 3)
+        assert rating.get_rating() == 3
 
     def test_update_rating_with_invalid_id(self):
         rating = update_rating(9080, 3)
@@ -444,7 +444,7 @@ class RatingsIntegrationTests(unittest.TestCase):
 
     def test_delete_rating(self):
         rating = create_rating(1, 2, 5)
-        status = delete_rating(rating.id)
+        status = delete_rating(rating.get_id())
         assert status is True
 
     def test_delete_rating_with_invalid_id(self):
@@ -456,8 +456,8 @@ class RatingsIntegrationTests(unittest.TestCase):
 class RankingsIntegrationTests(unittest.TestCase):
     def test_create_ranking(self):
         image = create_image(1, "https://www.picsum.com/200/300")
-        ranking = create_ranking(2, image.id, 5)
-        assert ranking.image_id == image.id
+        ranking = create_ranking(2, image.get_id(), 5)
+        assert ranking.get_image_id() == image.get_id()
 
     def test_create_ranking_with_invalid_id(self):
         with self.subTest("Invalid image id"):
@@ -469,8 +469,8 @@ class RankingsIntegrationTests(unittest.TestCase):
 
     def test_get_ranking(self):
         ranking = create_ranking(1, 2, 5)
-        ranking2 = get_ranking(ranking.id)
-        assert ranking2.image_id == ranking.image_id
+        ranking2 = get_ranking(ranking.get_id())
+        assert ranking2.get_image_id() == ranking.get_image_id()
 
     def test_get_ranking_with_invalid_id(self):
         ranking = get_ranking(9080)
@@ -479,15 +479,15 @@ class RankingsIntegrationTests(unittest.TestCase):
     def test_get_ranking_json(self):
         ranking = create_ranking(1, 2, 5)
         self.assertDictEqual(
-            get_ranking_json(ranking.id),
-            {"id": ranking.id, "ranker_id": 1, "image_id": 2, "rank": 5},
+            get_ranking_json(ranking.get_id()),
+            {"id": ranking.get_id(), "ranker_id": 1, "image_id": 2, "rank": 5},
         )
 
     def test_get_rankings_by_user(self):
         user = create_user("jane1", "janepass")
-        create_ranking(user.id, 2, 5)
-        create_ranking(user.id, 3, 3)
-        rankings = get_rankings_by_ranker(user.id)
+        create_ranking(user.get_id(), 2, 5)
+        create_ranking(user.get_id(), 3, 3)
+        rankings = get_rankings_by_ranker(user.get_id())
         assert len(rankings) == 2
 
     def test_get_rankings_by_user_with_invalid_user_id(self):
@@ -496,9 +496,9 @@ class RankingsIntegrationTests(unittest.TestCase):
 
     def test_get_rankings_by_image(self):
         image = create_image(1, "https://www.picsum.com/200/300")
-        create_ranking(2, image.id, 5)
-        create_ranking(3, image.id, 3)
-        rankings = get_rankings_by_image(image.id)
+        create_ranking(2, image.get_id(), 5)
+        create_ranking(3, image.get_id(), 3)
+        rankings = get_rankings_by_image(image.get_id())
         assert len(rankings) == 2
 
     def test_get_rankings_by_image_with_invalid_image_id(self):
@@ -507,12 +507,12 @@ class RankingsIntegrationTests(unittest.TestCase):
 
     def test_update_ranking(self):
         ranking = create_ranking(1, 2, 5)
-        ranking = update_ranking(ranking.id, 3)
-        assert ranking.rank == 3
+        ranking = update_ranking(ranking.get_id(), 3)
+        assert ranking.get_rank() == 3
 
     def test_delete_ranking(self):
         ranking = create_ranking(1, 2, 5)
-        status = delete_ranking(ranking.id)
+        status = delete_ranking(ranking.get_id())
         assert status is True
 
     def test_delete_ranking_with_invalid_id(self):
@@ -528,8 +528,8 @@ class DistributorsIntegrationTests(unittest.TestCase):
 
     def test_get_distributor(self):
         distributor = create_distributor()
-        distributor2 = get_distributor(distributor.id)
-        assert distributor2.timestamp == distributor.timestamp
+        distributor2 = get_distributor(distributor.get_id())
+        assert distributor2.get_timestamp() == distributor.get_timestamp()
 
     def test_get_distributor_with_invalid_id(self):
         distributor = get_distributor(9080)
@@ -539,17 +539,17 @@ class DistributorsIntegrationTests(unittest.TestCase):
         num_users = len(get_all_users())
         distributor = create_distributor()
         self.assertDictEqual(
-            get_distributor_json(distributor.id),
+            get_distributor_json(distributor.get_id()),
             {
-                "id": distributor.id,
+                "id": distributor.get_id(),
                 "num_profiles": num_users,
-                "timestamp": distributor.timestamp,
+                "timestamp": distributor.get_timestamp(),
             },
         )
 
     def test_delete_distributor(self):
         distributor = create_distributor()
-        status = delete_distributor(distributor.id)
+        status = delete_distributor(distributor.get_id())
         assert status is True
 
     def test_delete_distributor_with_invalid_id(self):

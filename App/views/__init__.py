@@ -1,6 +1,6 @@
 from .index import *
-
-# from .user import *
-# from .image import *
-# from .rating import *
-# from .ranking import *
+from .image import *
+from .user import *
+from .feed import *
+from .ranking import *
+from .rating import *

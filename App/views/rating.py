@@ -25,7 +25,7 @@ def create_rating_action():
     data = request.json
     if get_user(data["rater_id"]) and get_user(data["rated_id"]):
         rating = create_rating(data["rater_id"], data["rated_id"], data["rating"])
-        return jsonify(rating.to_json()), 201
+        return jsonify(get_rating_json(rating.get_id())), 201
     elif not get_user(data["rater_id"]):
         return jsonify({"message": "Rater does not exist"}), 404
     elif not get_user(data["rated_id"]):

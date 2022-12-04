@@ -26,7 +26,7 @@ def create_ranking_action():
     data = request.json
     if get_user(data["ranker_id"]) and get_image(data["image_id"]):
         ranking = create_ranking(data["ranker_id"], data["image_id"], data["rank"])
-        return jsonify(ranking.to_json()), 201
+        return jsonify(get_ranking_json(ranking.get_id())), 201
     elif not get_user(data["ranker_id"]):
         return jsonify({"message": "Ranker does not exist"}), 404
     elif not get_image(data["image_id"]):

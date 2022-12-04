@@ -4,6 +4,7 @@ from flask_jwt import jwt_required, current_identity
 
 from App.controllers import (
     create_user,
+    get_user_json,
     get_all_users_json,
     get_user,
     get_user_by_username,
@@ -54,7 +55,7 @@ def get_users_all_action():
 def get_user_by_id_action(id):
     user = get_user(id)
     if user:
-        return jsonify(user), 200
+        return jsonify(get_user_json(id)), 200
     return jsonify({"message": "User not found"}), 404
 
 

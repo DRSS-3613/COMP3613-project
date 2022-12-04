@@ -4,6 +4,7 @@ from flask_jwt import jwt_required
 from App.controllers import (
     get_user,
     get_feed,
+    get_feed_json,
     get_feeds_by_sender,
     get_feeds_by_sender_json,
     get_feeds_by_receiver,
@@ -20,7 +21,7 @@ feed_views = Blueprint("feed_views", __name__, template_folder="../templates")
 def get_feed_action(id):
     feed = get_feed(id)
     if feed:
-        return jsonify(feed.to_json()), 200
+        return jsonify(get_feed_json(id)), 200
     return jsonify({"error": "Feed not found."}), 404
 
 
@@ -53,5 +54,5 @@ def get_feeds_by_receiver_action(receiver_id):
 def view_feed_action(id):
     feed = view_feed(id)
     if feed:
-        return jsonify(feed.to_json()), 200
+        return jsonify(get_feed_json(id)), 200
     return jsonify({"error": "Feed not found."}), 404

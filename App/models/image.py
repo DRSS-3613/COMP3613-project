@@ -30,7 +30,6 @@ class Image(db.Model):
     def get_all_rankings(self):
         return self.rankings
 
-    # moved this logic to image controller
     def get_average_rank(self):
         rankings = self.rankings
         if len(rankings) == 0:

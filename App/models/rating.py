@@ -14,6 +14,18 @@ class Rating(db.Model):
         self.rated_id = rated_id
         self.rating = rating
 
+    def get_id(self):
+        return self.id
+
+    def get_rating(self):
+        return self.rating
+
+    def get_rater_id(self):
+        return self.rater_id
+
+    def get_rated_id(self):
+        return self.rated_id
+
     def set_rating(self, new_rating):
         self.rating = new_rating
 

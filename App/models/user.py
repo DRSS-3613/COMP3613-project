@@ -17,6 +17,12 @@ class User(db.Model):
         self.username = username
         self.set_password(password)
 
+    def get_id(self):
+        return self.id
+
+    def get_username(self):
+        return self.username
+
     def to_json(self):
         return {
             "id": self.id,

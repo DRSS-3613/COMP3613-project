@@ -6,9 +6,10 @@ from App.controllers import (
     get_user,
     create_image,
     get_image,
+    get_image_json,
     get_images_by_user,
     get_images_by_user_json,
-    get_image_rankings,
+    get_image_rankings_json,
     get_average_image_rank,
     delete_image,
 )
@@ -23,7 +24,7 @@ def post_image_action():
     data = request.json
     image = create_image(current_identity.id, data["url"])
     if image:
-        return jsonify(image.to_json()), 201
+        return jsonify(get_image_json(image.get_id())), 201
     return jsonify({"message": "Unable to create image"}), 400
 
 
@@ -33,7 +34,7 @@ def post_image_action():
 def get_image_action(id):
     image = get_image(id)
     if image:
-        return jsonify(image.to_json()), 200
+        return jsonify(get_image_json(id)), 200
     return jsonify({"message": "Image not found"}), 404
 
 
@@ -66,7 +67,7 @@ def get_average_image_rank_action(image_id):
 def get_image_rankings_action(image_id):
     image = get_image(image_id)
     if image:
-        return jsonify(get_image_rankings(image_id)), 200
+        return jsonify(get_image_rankings_json(image_id)), 200
     return jsonify({"message": "Image not found"}), 404
 
 
