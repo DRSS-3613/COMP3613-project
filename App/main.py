@@ -13,11 +13,15 @@ from App.controllers import setup_jwt, load_user_from_id
 
 from App.views import (
     index_views,
-)  # user_views, image_views, rating_views, ranking_views,
+    user_views,
+    rating_views,
+    ranking_views,
+    image_views,
+    feed_views,
+)
 
 # New views must be imported and added to this list
-
-views = [index_views]  # user_views, image_views, rating_views, ranking_views, ]
+views = [index_views, user_views, rating_views, ranking_views, image_views, feed_views]
 
 
 def add_views(app, views):
