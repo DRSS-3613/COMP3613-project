@@ -9,9 +9,7 @@ from App.controllers.distributor import (
     create_distributor,
     get_distributor,
     get_distributor_json,
-    get_distributor_feeds,
     delete_distributor,
-    distribute,
 )
 from App.controllers.feed import (
     create_feed,
@@ -80,7 +78,7 @@ class UserUnitTests(unittest.TestCase):
 
     def test_hashed_password(self):
         password = "mypass"
-        hashed = generate_password_hash(password, method="sha256")
+        generate_password_hash(password, method="sha256")
         user = User("bob", password)
         assert user.password != password
 
@@ -557,10 +555,3 @@ class DistributorsIntegrationTests(unittest.TestCase):
     def test_delete_distributor_with_invalid_id(self):
         status = delete_distributor(9080)
         assert status is False
-
-    def test_distribute(self):
-        distributor = create_distributor()
-        num_users = len(get_all_users())
-        distribute()
-        num_feeds = len(get_distributor_feeds(distributor.id))
-        assert num_feeds == num_users

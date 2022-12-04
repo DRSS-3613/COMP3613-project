@@ -1,10 +1,9 @@
 import os
 from flask import Flask
-from flask_login import LoginManager, current_user
+from flask_login import LoginManager
 from flask_uploads import DOCUMENTS, IMAGES, TEXT, UploadSet, configure_uploads
 from flask_cors import CORS
-from werkzeug.utils import secure_filename
-from werkzeug.datastructures import FileStorage
+
 from datetime import timedelta
 
 
@@ -26,7 +25,7 @@ def add_views(app, views):
         app.register_blueprint(view)
 
 
-def loadConfig(app, config):
+def load_config(app, config):
     app.config["ENV"] = os.environ.get("ENV", "DEVELOPMENT")
     if app.config["ENV"] == "DEVELOPMENT":
         app.config.from_object("App.config")
@@ -47,7 +46,7 @@ def loadConfig(app, config):
 def create_app(config={}):
     app = Flask(__name__, static_url_path="/static")
     CORS(app)
-    loadConfig(app, config)
+    load_config(app, config)
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["TEMPLATES_AUTO_RELOAD"] = True
     app.config["PREFERRED_URL_SCHEME"] = "https"

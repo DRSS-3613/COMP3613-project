@@ -17,7 +17,11 @@ user_views = Blueprint("user_views", __name__, template_folder="../templates")
 @user_views.route("/identify", methods=["GET"])
 @jwt_required()
 def identify():
-    return jsonify({"message": f"username: {current_identity.username}, id : {current_identity.id}"})
+    return jsonify(
+        {
+            "message": f"username: {current_identity.username}, id : {current_identity.id}"
+        }
+    )
 
 
 # Sign up route

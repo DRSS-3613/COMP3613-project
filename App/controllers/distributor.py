@@ -101,7 +101,7 @@ def distribute():
                             and not already_received
                             and (sender_id not in senders)
                         ):
-                            create_feed(sender_id, receiver_id, dist_id)
+                            create_feed(sender_id, receiver_id, distributor.id)
                             senders.append(sender_id)
                             receivers.append(receiver_id)
                             break
@@ -143,7 +143,7 @@ def distribute():
                                 and sender_id != receiver_id
                                 and sender_id not in senders
                             ):
-                                create_feed(sender_id, receiver_id, dist_id)
+                                create_feed(sender_id, receiver_id, distributor.id)
                                 senders.append(sender_id)
                                 receivers.append(receiver_id)
                                 break
@@ -162,12 +162,19 @@ def distribute_all():
         counter += 1
     return counter
 
+
 def get_distribution_table():
     distributors = get_all_distributors()
     table = {0: {"FEED ID", "RECEIVER", "SENDER", "DISTRIBUTOR", "SEEN"}}
     for distributor in distributors:
         for feed in distributor.feed:
-            table[feed.id] = {feed.id, feed.receiver_id, feed.sender_id, feed.distributor_id, feed.seen}
+            table[feed.id] = {
+                feed.id,
+                feed.receiver_id,
+                feed.sender_id,
+                feed.distributor_id,
+                feed.seen,
+            }
     return table
 
 
@@ -177,7 +184,13 @@ def get_unseen_distribution_table():
     for distributor in distributors:
         for feed in distributor.feed:
             if not feed.seen:
-                table[feed.id] = {feed.id, feed.receiver_id, feed.sender_id, feed.distributor_id, feed.seen}
+                table[feed.id] = {
+                    feed.id,
+                    feed.receiver_id,
+                    feed.sender_id,
+                    feed.distributor_id,
+                    feed.seen,
+                }
     return table
 
 
@@ -187,5 +200,11 @@ def get_seen_distribution_table():
     for distributor in distributors:
         for feed in distributor.feed:
             if feed.seen:
-                table[feed.id] = {feed.id, feed.receiver_id, feed.sender_id, feed.distributor_id, feed.seen}
+                table[feed.id] = {
+                    feed.id,
+                    feed.receiver_id,
+                    feed.sender_id,
+                    feed.distributor_id,
+                    feed.seen,
+                }
     return table
