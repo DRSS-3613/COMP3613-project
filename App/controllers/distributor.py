@@ -55,10 +55,11 @@ def delete_distributor(id):
     return False
 
 
-def distribute(dist_id):
+def distribute():
     receivers = []
     senders = []
-    distributor = Distributor.query.get(dist_id)
+    distributor = create_distributor()
+    # print(f"{distributor.id} and {distributor.num_profiles} ")
     if distributor:
         # loops through all the profiles for each receiver
         for receiver_id in range(1, distributor.num_profiles + 1):
@@ -73,6 +74,7 @@ def distribute(dist_id):
                     >= (datetime.now() - timedelta(days=1))
                 ]
             )
+            # print(f"count: {daily_receiver_counter}")
             # if the receiver has gotten less than the number of profiles per day, they can receive more
             if daily_receiver_counter < distributor.num_profiles:
                 # loops through all the profiles for each sender
@@ -147,6 +149,43 @@ def distribute(dist_id):
                                 break
         # if after both loops, the number of receivers is still less than the number of profiles, there are no more
         # profiles below the limit and therefore no more feeds can be generated
-        if len(senders) < distributor.num_profiles:
+        if len(senders) == 0 or len(receivers) == 0:
             return False
         return True
+
+
+def distribute_all():
+    status = distribute()
+    counter = 1
+    while not status:
+        status = distribute()
+        counter += 1
+    return counter
+
+def get_distribution_table():
+    distributors = get_all_distributors()
+    table = {0: {"FEED ID", "RECEIVER", "SENDER", "DISTRIBUTOR", "SEEN"}}
+    for distributor in distributors:
+        for feed in distributor.feed:
+            table[feed.id] = {feed.id, feed.receiver_id, feed.sender_id, feed.distributor_id, feed.seen}
+    return table
+
+
+def get_unseen_distribution_table():
+    distributors = get_all_distributors()
+    table = {0: {"FEED ID", "RECEIVER", "SENDER", "DISTRIBUTOR", "SEEN"}}
+    for distributor in distributors:
+        for feed in distributor.feed:
+            if not feed.seen:
+                table[feed.id] = {feed.id, feed.receiver_id, feed.sender_id, feed.distributor_id, feed.seen}
+    return table
+
+
+def get_seen_distribution_table():
+    distributors = get_all_distributors()
+    table = {0: {"FEED ID", "RECEIVER", "SENDER", "DISTRIBUTOR", "SEEN"}}
+    for distributor in distributors:
+        for feed in distributor.feed:
+            if feed.seen:
+                table[feed.id] = {feed.id, feed.receiver_id, feed.sender_id, feed.distributor_id, feed.seen}
+    return table

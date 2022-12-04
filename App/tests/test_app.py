@@ -198,7 +198,7 @@ class DistributorUnitTests(unittest.TestCase):
 
 
 # This fixture creates an empty database for the test and deletes it after the test
-# scope="class" would execute the fixture once and resued for all methods in the class
+# scope="class" would execute the fixture once and reused for all methods in the class
 @pytest.fixture(autouse=True, scope="module")
 def empty_db():
     app.config.update({"TESTING": True, "SQLALCHEMY_DATABASE_URI": "sqlite:///test.db"})
@@ -561,6 +561,6 @@ class DistributorsIntegrationTests(unittest.TestCase):
     def test_distribute(self):
         distributor = create_distributor()
         num_users = len(get_all_users())
-        distribute(distributor.id)
+        distribute()
         num_feeds = len(get_distributor_feeds(distributor.id))
         assert num_feeds == num_users

@@ -1,61 +1,80 @@
-from flask import Blueprint, render_template, jsonify, request, send_from_directory
-from flask_jwt import jwt_required
+from flask import Blueprint, jsonify, request
+from flask_jwt import jwt_required, current_identity
 
 
 from App.controllers import (
-    create_image,
-    get_all_images,
-    get_all_images_json,
-    get_images_by_userid_json,
-    get_image,
-    get_image_json,
-    delete_image,
     get_user,
+    create_image,
+    get_image,
+    get_images_by_user,
+    get_images_by_user_json,
+    get_image_rankings,
+    get_average_image_rank,
+    delete_image,
 )
 
 image_views = Blueprint("image_views", __name__, template_folder="../templates")
 
 
-@image_views.route("/images", methods=["GET"])
-def get_image_page():
-    images = get_all_images()
-    return render_template("images.html", images=images)
-
-
-@image_views.route("/api/images", methods=["POST"])
-def create_image_action():
+# Post image route
+@image_views.route("/api/image", methods=["POST"])
+@jwt_required()
+def post_image_action():
     data = request.json
-    user = get_user(data["userId"])
-    if user:
-        image = create_image(data["userId"])
-        return jsonify({"message": "Image created"})
-    return jsonify({"message": "User does not exist"})
+    image = create_image(current_identity.id, data["url"])
+    if image:
+        return jsonify(image.to_json()), 201
+    return jsonify({"message": "Unable to create image"}), 400
 
 
-@image_views.route("/api/images", methods=["GET"])
-def get_images_all_action():
-    images = get_all_images_json()
-    return jsonify(images)
+# Get image route
+@image_views.route("/api/image/<int:id>", methods=["GET"])
+@jwt_required()
+def get_image_action(id):
+    image = get_image(id)
+    if image:
+        return jsonify(image.to_json()), 200
+    return jsonify({"message": "Image not found"}), 404
 
 
-@image_views.route("/api/images/user", methods=["GET"])
-def get_images_by_user_action():
-    data = request.json
-    images = get_images_by_userid_json(data["userId"])
-    return jsonify(images)
+# Get Images by User route
+@image_views.route("/api/image/user/<int:user_id>", methods=["GET"])
+@jwt_required()
+def get_images_by_user_action(user_id):
+    user = get_user(user_id)
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+    images = get_images_by_user(user_id)
+    if images:
+        return jsonify(get_images_by_user_json(user_id)), 200
+    return jsonify({"message": "No images found"}), 404
 
 
-@image_views.route("/api/images/id", methods=["GET"])
-def get_images_by_id_action():
-    data = request.json
-    image = get_image_json(data["id"])
-    return jsonify(image)
+# Get Average Image Rank route
+@image_views.route("/api/image/<int:image_id>/rank", methods=["GET"])
+@jwt_required()
+def get_average_image_rank_action(image_id):
+    image = get_image(image_id)
+    if image:
+        return jsonify({"average_rank": get_average_image_rank(image_id)}), 200
+    return jsonify({"message": "Image not found"}), 404
 
 
-@image_views.route("/api/images", methods=["DELETE"])
-def delete_image_action():
-    data = request.json
-    if get_image(data["id"]):
-        delete_image(data["id"])
-        return jsonify({"message": "Image Deleted"})
-    return jsonify({"message": "Image Not Found"})
+# Get Image Rankings route
+@image_views.route("/api/image/<int:image_id>/rankings", methods=["GET"])
+@jwt_required()
+def get_image_rankings_action(image_id):
+    image = get_image(image_id)
+    if image:
+        return jsonify(get_image_rankings(image_id)), 200
+    return jsonify({"message": "Image not found"}), 404
+
+
+# Delete Image route
+@image_views.route("/api/image/<int:id>", methods=["DELETE"])
+@jwt_required()
+def delete_image_action(id):
+    status = delete_image(id)
+    if status:
+        return jsonify({"message": "Image deleted"}), 200
+    return jsonify({"message": "Image not found"}), 404

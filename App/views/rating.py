@@ -1,100 +1,90 @@
-from flask import Blueprint, render_template, jsonify, request, send_from_directory
+from flask import Blueprint, jsonify, request
 from flask_jwt import jwt_required
 
 
 from App.controllers import (
-    create_rating,
-    get_all_ratings,
-    get_all_ratings_json,
-    get_rating,
-    get_ratings_by_target,
-    get_ratings_by_creator,
-    get_rating_by_actors,
-    update_rating,
     get_user,
-    get_calculated_rating,
+    create_rating,
+    get_rating_json,
+    get_ratings_by_rater,
+    get_ratings_by_rater_json,
+    get_ratings_by_rated,
+    get_ratings_by_rated_json,
+    get_rating,
+    update_rating,
+    delete_rating,
 )
 
 rating_views = Blueprint("rating_views", __name__, template_folder="../templates")
 
 
+# Create Rating route
 @rating_views.route("/api/ratings", methods=["POST"])
+@jwt_required()
 def create_rating_action():
     data = request.json
-    if get_user(data["creatorId"]) and get_user(data["targetId"]):
-        if data["creatorId"] != data["targetId"]:
-
-            prev = get_rating_by_actors(data["creatorId"], data["targetId"])
-            if prev:
-                return jsonify({"message": "Current user already rated this user"})
-            rating = create_rating(data["creatorId"], data["targetId"], data["score"])
-            return jsonify({"message": "Rating created"})
-
-        return jsonify({"message": "User cannot rate self"})
-    return jsonify({"message": "User not found"})
+    if get_user(data["rater_id"]) and get_user(data["rated_id"]):
+        rating = create_rating(data["rater_id"], data["rated_id"], data["rating"])
+        return jsonify(rating.to_json()), 201
+    elif not get_user(data["rater_id"]):
+        return jsonify({"message": "Rater does not exist"}), 404
+    elif not get_user(data["rated_id"]):
+        return jsonify({"message": "Rated does not exist"}), 404
+    else:
+        return jsonify({"message": "Something went wrong"}), 500
 
 
-@rating_views.route("/api/ratings", methods=["GET"])
-def get_all_ratings_action():
-    ratings = get_all_ratings_json()
-    return jsonify(ratings)
-
-
-@rating_views.route("/api/ratings/byid", methods=["GET"])
-def get_rating_action():
-    data = request.json
-    rating = get_rating(data["id"])
+# Get Rating
+@rating_views.route("/api/ratings/<int:id>", methods=["GET"])
+@jwt_required()
+def get_rating_action(id):
+    rating = get_rating(id)
     if rating:
-        return rating.to_json()
-    return jsonify({"message": "Rating not found"})
+        return jsonify(get_rating_json(id)), 200
+    else:
+        return jsonify({"message": "Rating does not exist"}), 404
 
 
-@rating_views.route("/api/ratings/bycreator", methods=["GET"])
-def get_rating_by_creator_action():
+# Get Ratings by Rater route
+@rating_views.route("/api/ratings/rater/<int:rater_id>", methods=["GET"])
+@jwt_required()
+def get_ratings_by_rater_action(rater_id):
+    ratings = get_ratings_by_rater(rater_id)
+    if ratings:
+        return jsonify(get_ratings_by_rater_json(rater_id)), 200
+    else:
+        return jsonify({"message": "Rater does not exist"}), 404
+
+
+# Get Ratings by Rated route
+@rating_views.route("/api/ratings/rated/<int:rated_id>", methods=["GET"])
+@jwt_required()
+def get_ratings_by_rated_action(rated_id):
+    ratings = get_ratings_by_rated(rated_id)
+    if ratings:
+        return jsonify(get_ratings_by_rated_json(rated_id)), 200
+    else:
+        return jsonify({"message": "Rated does not exist"}), 404
+
+
+# Update Rating route
+@rating_views.route("/api/ratings/<int:id>", methods=["PUT"])
+@jwt_required()
+def update_rating_action(id):
     data = request.json
-    if get_user(data["creatorId"]):
-        rating = get_ratings_by_creator(data["creatorId"])
-        if rating:
-            return jsonify(rating)
-        return jsonify({"message": "No ratings by this user found"})
-    return jsonify({"message": "User not found"})
+    status = update_rating(id, data["rating"])
+    if status:
+        return jsonify(get_rating_json(id)), 200
+    else:
+        return jsonify({"message": "Rating does not exist"}), 404
 
 
-@rating_views.route("/api/ratings/bytarget", methods=["GET"])
-def get_rating_by_target_action():
-    data = request.json
-    if get_user(data["targetId"]):
-        rating = get_ratings_by_target(data["targetId"])
-        if rating:
-            return jsonify(rating)
-        return jsonify({"message": "No ratings for this user found"})
-    return jsonify({"message": "User not found"})
-
-
-@rating_views.route("/api/ratings", methods=["PUT"])
-def update_rating_action():
-    data = request.json
-    rating = update_rating(data["id"], data["score"])
-    if rating:
-        return jsonify({"message": "Rating updated"})
-    return jsonify({"message": "Rating not found"})
-
-
-# @rating_views.route('/api/ratings', methods=['DELETE'])
-# def delete_rating_action():
-#     data = request.json
-#     if get_rating(data['id']):
-#         delete_rating(data['id'])
-#         return jsonify({"message":"Rating deleted"})
-#     return jsonify({"message":"Rating not found"})
-
-
-@rating_views.route("/api/ratings/calc", methods=["GET"])
-def get_calculated_rating_action():
-    data = request.json
-    if get_user(data["targetId"]):
-        rating = get_calculated_rating(data["targetId"])
-        if rating:
-            return jsonify({"calculated rating": rating})
-        return jsonify({"message": "No ratings by this user found"})
-    return jsonify({"message": "User not found"})
+# Delete Rating route
+@rating_views.route("/api/ratings/<int:id>", methods=["DELETE"])
+@jwt_required()
+def delete_rating_action(id):
+    status = delete_rating(id)
+    if status:
+        return jsonify({"message": "Rating deleted"}), 200
+    else:
+        return jsonify({"message": "Rating does not exist"}), 404

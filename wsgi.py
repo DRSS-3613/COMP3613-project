@@ -16,6 +16,7 @@ from App.controllers import (
     get_feeds_by_receiver,
     get_feed,
     view_feed,
+    get_distributor_json
 )
 
 # This commands file allow you to create convenient CLI commands for testing controllers
@@ -134,9 +135,9 @@ def add_images_command():
 
 @app.cli.command("distribute-data")
 def distribute_data_command():
-    users = get_all_users()
+    # users = get_all_users()
     dist = create_distributor()
-    outcome = distribute(dist.id)
+    outcome = distribute()
     if outcome:
         print("data distributed...see table below")
         distributors = get_all_distributors()
@@ -182,3 +183,9 @@ def print_distribution_command():
             print(
                 f"    {feed.id}    |    {feed.receiver_id}    |    {feed.sender_id}    |    {feed.distributor_id}    |   {feed.seen}    "
             )
+
+
+@app.cli.command("print-dists")
+def print_distributors():
+    distributors = [get_distributor_json(d.id) for d in get_all_distributors()]
+    print(distributors)
