@@ -20,7 +20,8 @@ user_views = Blueprint("user_views", __name__, template_folder="../templates")
 def identify():
     return jsonify(
         {
-            "message": f"username: {current_identity.username}, id : {current_identity.id}"
+            'id': current_identity.id,
+            'username': current_identity.username,
         }
     )
 
