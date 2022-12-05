@@ -44,6 +44,7 @@ from App.controllers.rating import (
     get_rating_json,
     get_ratings_by_rater,
     get_ratings_by_rated,
+    get_average_rating_by_rated,
     update_rating,
     delete_rating,
 )
@@ -432,6 +433,14 @@ class RatingsIntegrationTests(unittest.TestCase):
         create_rating(2, user.get_id(), 3)
         ratings = get_ratings_by_rated(user.get_id())
         assert len(ratings) == 2
+
+    def test_get_average_rating(self):
+        user = create_user("jane99", "janepass")
+        create_rating(1, user.get_id(), 5)
+        create_rating(2, user.get_id(), 3)
+        average_rating = get_average_rating_by_rated(user.get_id())
+        assert average_rating == 4
+
 
     def test_update_rating(self):
         rating = create_rating(1, 2, 5)

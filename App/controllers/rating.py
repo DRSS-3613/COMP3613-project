@@ -54,6 +54,16 @@ def get_ratings_by_rated_json(rated_id):
     return [rating.to_json() for rating in ratings]
 
 
+def get_average_rating_by_rated(rated_id):
+    ratings = Rating.query.filter_by(rated_id=rated_id).all()
+    if ratings:
+        total = 0
+        for rating in ratings:
+            total += rating.get_rating()
+        return total / len(ratings)
+    return None
+
+
 def update_rating(id, new_rating):
     rating = Rating.query.get(id)
     if rating:

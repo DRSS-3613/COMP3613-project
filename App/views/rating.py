@@ -10,6 +10,7 @@ from App.controllers import (
     get_ratings_by_rater_json,
     get_ratings_by_rated,
     get_ratings_by_rated_json,
+    get_average_rating_by_rated,
     get_rating,
     update_rating,
     delete_rating,
@@ -62,7 +63,18 @@ def get_ratings_by_rater_action(rater_id):
 def get_ratings_by_rated_action(rated_id):
     ratings = get_ratings_by_rated(rated_id)
     if ratings:
-        return jsonify(get_ratings_by_rated_json(rated_id)), 200
+        return jsonify(get_ratings_by_rated(rated_id)), 200
+    else:
+        return jsonify({"message": "Rated does not exist"}), 404
+
+
+# Get Average Rating by Rated route
+@rating_views.route("/api/ratings/rated/<int:rated_id>/average", methods=["GET"])
+@jwt_required()
+def get_average_rating_by_rated_action(rated_id):
+    average = get_average_rating_by_rated(rated_id)
+    if average:
+        return jsonify({"average": average}), 200
     else:
         return jsonify({"message": "Rated does not exist"}), 404
 
