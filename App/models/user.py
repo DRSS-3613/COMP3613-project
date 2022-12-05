@@ -28,6 +28,7 @@ class User(db.Model):
             "id": self.id,
             "username": self.username,
             "images": [image.to_json() for image in self.images],
+            "rankings": [ranking.to_json() for ranking in self.rankings],
         }
 
     def set_password(self, password):

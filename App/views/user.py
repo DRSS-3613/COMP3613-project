@@ -9,6 +9,7 @@ from App.controllers import (
     get_user,
     get_user_by_username,
     delete_user,
+    get_user_summary,
     distribute_all,
 )
 
@@ -57,6 +58,16 @@ def get_user_by_id_action(id):
     user = get_user(id)
     if user:
         return jsonify(get_user_json(id)), 200
+    return jsonify({"message": "User not found"}), 404
+
+
+# Get User Summary
+@user_views.route("/api/users/<int:id>/summary", methods=["GET"])
+@jwt_required()
+def get_user_summary_action(id):
+    user = get_user(id)
+    if user:
+        return jsonify(get_user_summary(id)), 200
     return jsonify({"message": "User not found"}), 404
 
 

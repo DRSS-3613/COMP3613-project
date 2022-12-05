@@ -1,5 +1,6 @@
 from App.models import User
 from App.database import db
+from App.controllers import get_average_rating_by_rated, get_ratings_by_rated
 
 
 def create_user(username, password):
@@ -38,6 +39,19 @@ def get_all_users_json():
         return []
     users = [user.to_json() for user in users]
     return users
+
+
+def get_user_summary(id):
+    user = get_user(id)
+    if user:
+        return {
+            "id": user.id,
+            "username": user.username,
+            "images": [image.to_json() for image in user.images],
+            "average_rating": get_average_rating_by_rated(user.id),
+            "ratings": [rating.to_json() for rating in get_ratings_by_rated(user.id)],
+        }
+    return None
 
 
 def update_user(id, username):
