@@ -5,12 +5,13 @@ from flask_jwt import jwt_required, current_identity
 from App.controllers import (
     create_user,
     get_user_json,
-    get_user_avatar,
     get_all_users_json,
     get_user,
     get_user_by_username,
     delete_user,
-    get_user_summary,
+    get_ratings_by_rated_json,
+    get_average_rating_by_rated,
+    get_images_by_user_json,
     distribute_all,
 )
 
@@ -22,8 +23,8 @@ user_views = Blueprint("user_views", __name__, template_folder="../templates")
 def identify():
     return jsonify(
         {
-            'id': current_identity.id,
-            'username': current_identity.username,
+            "id": current_identity.id,
+            "username": current_identity.username,
         }
     )
 
@@ -82,7 +83,15 @@ def get_user_by_id_action(id):
 def get_user_summary_action(id):
     user = get_user(id)
     if user:
-        return jsonify(get_user_summary(id)), 200
+        summary = {
+            "id": user.get_id(),
+            "username": user.get_username(),
+            "avatar": user.get_avatar(),
+            "images": get_images_by_user_json(user.get_id()),
+            "average_rating": get_average_rating_by_rated(user.get_id()),
+            "ratings": get_ratings_by_rated_json(user.get_id()),
+        }
+        return jsonify(summary), 200
     return jsonify({"message": "User not found"}), 404
 
 

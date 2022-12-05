@@ -74,7 +74,14 @@ class UserUnitTests(unittest.TestCase):
     def test_to_json(self):
         user = User("bob1", "bobpass")
         self.assertDictEqual(
-            user.to_json(), {"id": None, "username": "bob1", "images": []}
+            user.to_json(),
+            {
+                "id": None,
+                "username": "bob1",
+                "avatar": "https://gravatar.com/avatar/0020f74200278c9a66fc97e1ffb3e1bf?s=400&d=robohash&r=x",
+                "images": [],
+                "rankings": [],
+            },
         )
 
     def test_hashed_password(self):
@@ -440,7 +447,6 @@ class RatingsIntegrationTests(unittest.TestCase):
         create_rating(2, user.get_id(), 3)
         average_rating = get_average_rating_by_rated(user.get_id())
         assert average_rating == 4
-
 
     def test_update_rating(self):
         rating = create_rating(1, 2, 5)

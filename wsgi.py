@@ -16,7 +16,7 @@ from App.controllers import (
     get_feeds_by_receiver,
     get_feed,
     view_feed,
-    get_distributor_json
+    get_distributor_json,
 )
 
 # This commands file allow you to create convenient CLI commands for testing controllers
