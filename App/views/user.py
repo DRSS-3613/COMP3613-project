@@ -5,6 +5,7 @@ from flask_jwt import jwt_required, current_identity
 from App.controllers import (
     create_user,
     get_user_json,
+    get_user_avatar,
     get_all_users_json,
     get_user,
     get_user_by_username,
@@ -39,6 +40,20 @@ def signup_action():
         distribute_all()
         return jsonify({"message": f"user {data['username']} created"}), 201
     return jsonify({"message": "User not created"}), 400
+
+
+# Set User Avatar route
+@user_views.route("/api/users/<int:id>/avatar", methods=["PUT"])
+@jwt_required()
+def set_user_avatar(id):
+    data = request.json
+    user = get_user(id)
+    if user:
+        if user.id == current_identity.id:
+            set_user_avatar(id, data["avatar"])
+            return jsonify({"message": "Avatar updated"}), 200
+        return jsonify({"message": "You can only update your own avatar"}), 400
+    return jsonify({"message": "User not found"}), 404
 
 
 # Get all users route

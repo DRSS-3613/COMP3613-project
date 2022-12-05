@@ -13,6 +13,23 @@ def create_user(username, password):
     return None
 
 
+def get_user_avatar(id):
+    user = get_user(id)
+    if user:
+        return user.get_avatar()
+    return None
+
+
+def set_user_avatar(id, avatar):
+    user = get_user(id)
+    if user:
+        user.set_avatar(avatar)
+        db.session.add(user)
+        db.session.commit()
+        return user
+    return None
+
+
 def get_user_by_username(username):
     user = User.query.filter_by(username=username).first()
     return user
@@ -45,11 +62,12 @@ def get_user_summary(id):
     user = get_user(id)
     if user:
         return {
-            "id": user.id,
-            "username": user.username,
-            "images": [image.to_json() for image in user.images],
-            "average_rating": get_average_rating_by_rated(user.id),
-            "ratings": [rating.to_json() for rating in get_ratings_by_rated(user.id)],
+            "id": user.get_id(),
+            "username": user.get_username(),
+            "avatar": user.get_avatar(),
+            "images": [image.to_json() for image in user.get_images()],
+            "average_rating": get_average_rating_by_rated(user.get_id()),
+            "ratings": [rating.to_json() for rating in get_ratings_by_rated(user.get_id())],
         }
     return None
 
