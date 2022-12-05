@@ -60,7 +60,7 @@ def get_average_rating_by_rated(rated_id):
         total = 0
         for rating in ratings:
             total += rating.get_rating()
-        return total / len(ratings)
+        return round(total / len(ratings))
     return None
 
 

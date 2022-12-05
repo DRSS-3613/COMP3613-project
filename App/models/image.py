@@ -37,7 +37,7 @@ class Image(db.Model):
         total = 0
         for ranking in rankings:
             total += ranking.rank
-        return total / len(rankings)
+        return round(total / len(rankings))
 
     def to_json(self):
         return {
