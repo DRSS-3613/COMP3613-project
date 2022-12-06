@@ -10,7 +10,7 @@ from App.controllers import (
     get_all_users,
     get_user_by_username,
     create_image,
-    create_distributor,
+    distribute_all,
     distribute,
     get_all_distributors,
     get_feeds_by_receiver,
@@ -41,6 +41,7 @@ User Commands
 # create a group, it would be the first argument of the comand
 # eg : flask user <command>
 user_cli = AppGroup("user", help="User object commands")
+
 
 # Then define the command and any parameters and annotate it with the group (@)
 @user_cli.command("create", help="Creates a user")
@@ -135,7 +136,6 @@ def add_images_command():
 
 @app.cli.command("distribute-data")
 def distribute_data_command():
-    dist = create_distributor()
     outcome = distribute()
     if outcome:
         print("data distributed...see table below")
@@ -149,6 +149,13 @@ def distribute_data_command():
                 )
     else:
         print("data not distributed - all profiles at limit")
+
+
+@app.cli.command("distribute-all")
+def distribute_all_command():
+    counter = distribute_all()
+    if counter:
+        print(f"{counter} distributions made")
 
 
 @app.cli.command("view-profile")

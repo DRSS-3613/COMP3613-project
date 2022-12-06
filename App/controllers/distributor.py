@@ -157,7 +157,7 @@ def distribute():
 def distribute_all():
     status = distribute()
     counter = 1
-    while not status:
+    while status:
         status = distribute()
         counter += 1
     return counter
